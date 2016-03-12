@@ -6,25 +6,23 @@ var flow = function () {
 	players.push(new player());
 	determine_starting_troops(players);
 
-set_attacker(0,0);
-set_target(1,0);
-simulate_attack();
+	set_attacker(0,0);
+	set_target(1,0);
+	simulate_attack();
 
 
 	//round
-		//Q: do the following two rolls apply to all players?
-		//reinforcements, roll(10)
-		//initiative, roll(10) 
-
 		//turn
 		//for each player:
+			//reinforcements, roll(10)
+			//initiative, roll(10) 
 			//enable troops to form squads
 			//decide on clones
 				//decide number of clones
 				//decide which troop is cloned
 			//initialize new troops
 			//A: make / break up squads
-			//B: move
+			//B: move units
 			//C: attack
 			//D: throw grenades
 			//E: end turn
@@ -50,10 +48,19 @@ var determine_starting_troops = function (players) {
 			var new_troop = new troop();
 			new_troop.initialize(p, t);
 			player.troops.push(new_troop);
-
+		}
+		player.squads = [];
+		if (player.troops.length > 1) {
+			var new_squad = new squad();
+			var squad_troops = [];
+			squad_troops.push(player.troops[0]);
+			squad_troops.push(player.troops[1]);
+			new_squad.recalculate(squad_troops, p, 0);
+			player.squads.push(new_squad);
 		}
 
-	populate_troop_table(p);
+		populate_troop_table(p);
+		populate_squad_table(p);
 	}
 	console.log(players);
 	//do something
@@ -115,26 +122,42 @@ var troop = function () {
 var squad = function () {
 	this.troops;
 
-	var recalculate = function (troops) {
+	this.recalculate = function (troops, player_id, squad_id) {
 		this.troops = troops;
 
+		var pplus = player_id - 0 + 1;
+		var splus = squad_id - 0 + 1;
+		this.name = "p"+pplus+"-s"+splus;
+
+		var troop, t;
 		for (t in troops) {
-			if (this.hit_points < t.hit_points)
-				this.hit_points = t.hit_points;
-			if (this.attack < t.attack)
-				this.attack = t.attack;
-			if (this.armour < t.armour)
-				this.armour = t.armour;
-			if (this.range < t.range)
-				this.range = t.range;
-			if (this.line_of_sight < t.line_of_sight)
-				this.line_of_sight = t.line_of_sight;
-			if (this.agility < t.agility)
-				this.agility = t.agility;
-			if (this.accuracy < t.accuracy)
-				this.accuracy = t.accuracy;
-			if (this.speed < t.speed)
-				this.speed = t.speed;
+			troop = troops[t];
+			if (t == 0) {
+				this.hit_points = troop.hit_points;
+				this.attack = troop.attack;
+				this.armour = troop.armour;
+				this.range = troop.range;
+				this.line_of_sight = troop.line_of_sight;
+				this.agility = troop.agility;
+				this.accuracy = troop.accuracy;
+				this.speed = troop.speed;
+			}
+			if (this.hit_points < troop.hit_points)
+				this.hit_points = troop.hit_points;
+			if (this.attack < troop.attack)
+				this.attack = troop.attack;
+			if (this.armour < troop.armour)
+				this.armour = troop.armour;
+			if (this.range < troop.range)
+				this.range = troop.range;
+			if (this.line_of_sight < troop.line_of_sight)
+				this.line_of_sight = troop.line_of_sight;
+			if (this.agility < troop.agility)
+				this.agility = troop.agility;
+			if (this.accuracy < troop.accuracy)
+				this.accuracy = troop.accuracy;
+			if (this.speed < troop.speed)
+				this.speed = troop.speed;
 		}
 
 		var speed_bonus;
@@ -163,6 +186,11 @@ var squad = function () {
 		this.agility += agility_bonus;
 		this.attack += attack_bonus;
 		this.range += range_bonus;
+
+		if (this.speed < 1) this.speed = 1;
+		if (this.agility < 1) this.agility = 1;
+		if (this.attack > 10) this.attack = 10;
+		if (this.range > 10) this.range = 10;
 
 		//Q: if all troops have 1 SPD, can SPD be 0, -1?
 		//Q: is the max number of troops in one squad 4?
@@ -205,6 +233,11 @@ var calculate_damage = function (attacker, defender, firing_blind) {
 	results.hit = hit;
 	results.blocked = blocked;
 	results.dead = dead;
+	//results.extra_armour_when_compleyely_defended
+	//results.extra_accuracy_when_hit
+	//results.missed_by
+	//results.overkill
+	//results.health_remaining
 
 	return results;
 };
@@ -243,7 +276,11 @@ var roll = function (max) {
 	return Math.floor((Math.random() * max) + 1);
 };
 
-
+var color_cell = function (cell, value) {
+	cell.innerHTML = value;
+	cell.style.backgroundColor = "#"+ (11-value-1) + "" + (value-1) + "" + (Math.floor(value/2));
+	cell.style.color = "#FFF";
+}
 
 var populate_troop_table = function (player_id) {
 	var table = document.getElementById("troop_table"+player_id);
@@ -253,38 +290,169 @@ var populate_troop_table = function (player_id) {
 		var cell = row.insertCell(-1);
 		cell.innerHTML = troop.name
 		var cell = row.insertCell(-1);
-		cell.innerHTML = troop.hit_points;
+		color_cell(cell, troop.hit_points);
 		var cell = row.insertCell(-1);
-		cell.innerHTML = troop.attack;
+		color_cell(cell, troop.attack);
 		var cell = row.insertCell(-1);
-		cell.innerHTML = troop.armour;
+		color_cell(cell, troop.armour);
 		var cell = row.insertCell(-1);
-		cell.innerHTML = troop.range;
+		color_cell(cell, troop.range);
 		var cell = row.insertCell(-1);
-		cell.innerHTML = troop.line_of_sight;
+		color_cell(cell, troop.line_of_sight);
 		var cell = row.insertCell(-1);
-		cell.innerHTML = troop.agility;
+		color_cell(cell, troop.agility);
 		var cell = row.insertCell(-1);
-		cell.innerHTML = troop.accuracy;
+		color_cell(cell, troop.accuracy);
 		var cell = row.insertCell(-1);
-		cell.innerHTML = troop.speed;
+		color_cell(cell, troop.speed);
+
 		var cell = row.insertCell(-1);
-		cell.innerHTML = "<button onclick=attacker("+player_id+","+t+")>attacker</button>";
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "attacker";
+		button.onclick = function () {attacker(troop)};
+		cell.appendChild(button);
+
 		var cell = row.insertCell(-1);
-		cell.innerHTML = "<button onclick=target("+player_id+","+t+")>target</button>";
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "target";
+		button.onclick = function () {target(troop)};
+		cell.appendChild(button);
+
+		var cell = row.insertCell(-1);
+		cell.innerHTML = "none";
+		var cell = row.insertCell(-1);
+		cell.innerHTML = "<input type='checkbox'></input>";
+
+		var cell = row.insertCell(-1);
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "clone";
+		button.onclick = function () {clone_troop(troop)};
+		cell.appendChild(button);
+	}
+};
+
+var populate_squad_table = function (player_id) {
+	var table = document.getElementById("squad_table"+player_id);
+	for (s in players[player_id].squads) {
+		var squad = players[player_id].squads[s];
+		var row = table.insertRow(-1);
+		var cell = row.insertCell(-1);
+		cell.innerHTML = squad.name
+		var cell = row.insertCell(-1);
+		color_cell(cell, squad.hit_points);
+		var cell = row.insertCell(-1);
+		color_cell(cell, squad.attack);
+		var cell = row.insertCell(-1);
+		color_cell(cell, squad.armour);
+		var cell = row.insertCell(-1);
+		color_cell(cell, squad.range);
+		var cell = row.insertCell(-1);
+		color_cell(cell, squad.line_of_sight);
+		var cell = row.insertCell(-1);
+		color_cell(cell, squad.agility);
+		var cell = row.insertCell(-1);
+		color_cell(cell, squad.accuracy);
+		var cell = row.insertCell(-1);
+		color_cell(cell, squad.speed);
+
+		var cell = row.insertCell(-1);
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "attacker";
+		button.onclick = function () {attacker(squad)};
+		cell.appendChild(button);
+
+		var cell = row.insertCell(-1);
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "target";
+		button.onclick = function () {target(squad)};
+		cell.appendChild(button);
+
+		var cell = row.insertCell(-1);
+		cell.innerHTML = squad.troops.length;
+
+		var cell = row.insertCell(-1);
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "break up";
+		button.onclick = function () {break_up(squad)};
+		cell.appendChild(button);
+
+		var cell = row.insertCell(-1);
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "clone";
+		button.onclick = function () {clone_squad(squad)};
+		cell.appendChild(button);
 	}
 };
 
 var demo = {};
 
+var break_up = function (squad) {
+	alert("can not yet break up squads");
+	//remove squad from player squads
+	//remove row from table
+	//update affected troop rows
+	//clear demo fight
+	//update affected squad rows (id, name)
+};
+var clone_squad = function (squad){
+	alert("can not yet clone squads");
+	//clone troops in squad
+	//add to player troops
+	//add rows to troop table
+	//clone squad, but with new troops
+	//add to player squads
+	//add row to squad table
 
+};
+var clone_troop = function (troop) {
+	alert("can not yet clone troops");
+	//clone troop
+	//add to player troop
+	//add row to troop table
+};
+var form_squad = function (troops) {
+	alert("can not yet form squads");
+	//check to see if 2-4 are selected
+	//create squad
+	//update affected troop rows
+	//disable buttons, checkboxes, update text
+	//add squad to player squads
+	//add row to squad table
+};
+var new_troop = function (player_id) {
+	alert("can not yet get new troop");
+	//create troop
+	//add to player troops
+	//add row to troop table
+};
 
-var attacker = function(player_id, troop_id) {
-	demo.attacker = players[player_id].troops[troop_id];
+var kill_troop = function (squad) {
+	alert("can not yet kill troop");
+	//delete troops
+	//remove troop rows
+};
+
+var kill_squad = function (squad) {
+	alert("can not yet kill squad");
+	//delete troops
+	//remove troop rows
+	//delete squad
+	//remove squad row
+};
+
+var attacker = function(attacker) {
+	demo.attacker = attacker;
 	simulate_attack();
 };
-var target = function(player_id, troop_id) {
-	demo.target = players[player_id].troops[troop_id];
+var target = function(target) {
+	demo.target = target;
 	simulate_attack();
 };
 
@@ -308,7 +476,6 @@ var simulate_attack = function () {
 		battle_label.innerHTML += "<br>" + demo.attacker.name + " misses " + demo.target.name + " by a mile";
 	}
 
-
 	if (results.blocked > 0 && results.damage == 0) {
 		battle_label.innerHTML += "<br>" + demo.target.name + " blocked all " + results.blocked + " damage like a juggernaught";
 	}
@@ -329,4 +496,3 @@ var simulate_attack = function () {
 	}
 
 };
-
