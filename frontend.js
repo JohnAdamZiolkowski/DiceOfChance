@@ -12,9 +12,12 @@ var populate_troop_table = function (player_id) {
 		table.deleteRow(r);
 	}
 
-	for (t in players[player_id].troops) {
-		var player = players[player_id];
-		var troop = player.troops[t];
+	var player = players[player_id];
+	var troops = player.troops;
+
+	var troop, t;
+	for (t = 0; t < troops.length; t++) {
+		var troop = troops[t];
 		var row = table.insertRow(-1);
 		var cell = row.insertCell(-1);
 		cell.innerHTML = troop.name
@@ -42,21 +45,27 @@ var populate_troop_table = function (player_id) {
 		} else {
 			squad_name = player.squads[troop.squad_id].name;
 		}
+		var id = t;
 
 		var cell = row.insertCell(-1);
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "attacker";
-		button.onclick = function () {attacker(troop)};
+		button.onclick = function () {
+			attacker(player_id, "troop", get_unit_id_from_element(this));
+		};
 		if (in_squad != undefined)
 			button.disabled = "disabled";
 		cell.appendChild(button);
+
 
 		var cell = row.insertCell(-1);
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "target";
-		button.onclick = function () {target(troop)};
+		button.onclick = function () {
+			target(player_id, "troop", get_unit_id_from_element(this));
+		};
 		if (in_squad != undefined)
 			button.disabled = "disabled";
 		cell.appendChild(button);
@@ -112,18 +121,24 @@ var populate_squad_table = function (player_id) {
 		var cell = row.insertCell(-1);
 		color_cell(cell, squad.speed);
 
+		var id = s;
+
 		var cell = row.insertCell(-1);
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "attacker";
-		button.onclick = function () {attacker(squad)};
+		button.onclick = function () {
+			attacker(player_id, "squad", get_unit_id_from_element(this));
+		};
 		cell.appendChild(button);
 
 		var cell = row.insertCell(-1);
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "target";
-		button.onclick = function () {target(squad)};
+		button.onclick = function () {
+			target(player_id, "squad", get_unit_id_from_element(this));
+		};
 		cell.appendChild(button);
 
 		var cell = row.insertCell(-1);
@@ -147,25 +162,65 @@ var populate_squad_table = function (player_id) {
 
 var demo = {};
 
-var attacker = function(attacker) {
-	demo.attacker = attacker;
+var attacker = function(player_id, type, id) {
+	set_attacker(player_id, type, id);
+	check_target();
 	simulate_attack();
 };
-var target = function(target) {
-	demo.target = target;
+var target = function(player_id, type, id) {
+	set_target(player_id, type, id);
+	check_attacker();
 	simulate_attack();
 };
 
+var check_attacker = function () {
+	var player_id = demo.attacker.player_id;
+	var unit_id = demo.attacker.unit_id;
+	var unit_type = demo.attacker.unit_type;
+	var attacker = get_unit(player_id, unit_type, unit_id);
 
-var set_attacker = function(player_id, troop_id) {
-	demo.attacker = players[player_id].troops[troop_id];
+	if (demo.attacker != attacker)
+		return false;
+	if (attacker.unit_type == "troop")
+		if (attacker.squad_id != undefined)
+			return false;
+
+	return true;
+}
+var check_target = function () {
+	var player_id = demo.target.player_id;
+	var unit_id = demo.target.unit_id;
+	var unit_type = demo.target.unit_type;
+	var target = get_unit(player_id, unit_type, unit_id);
+
+	if (demo.target != target)
+		return false;
+	if (target.unit_type == "troop")
+		if (target.squad_id != undefined)
+			return false;
+
+	return true;
+}
+
+var set_attacker = function(player_id, type, id) {
+	demo.attacker = get_unit(player_id, type, id);
 };
-var set_target = function(player_id, troop_id) {
-	demo.target = players[player_id].troops[troop_id];
+var set_target = function(player_id, type, id) {
+	demo.target = get_unit(player_id, type, id);
 };
 
 var simulate_attack = function () {
 	var battle_label = document.getElementById("battle_label");
+
+	if (!check_attacker()) {
+		battle_label.innerHTML = "select new attacker";
+		return;
+	} 
+	if (!check_target()) {
+		battle_label.innerHTML = "select new target";
+		return;
+	}
+
 	battle_label.innerHTML = demo.attacker.name + " attacks " + demo.target.name;
 	
 	var results = calculate_damage(demo.attacker, demo.target);
@@ -201,8 +256,7 @@ var simulate_attack = function () {
 var click_form_squad = function(e) {
 	var table = e.parentElement.parentElement.parentElement.parentElement;
 
-	//todo: fix, get from table
-	var player_id = table.getAttribute("data-player_id");
+	var player_id = get_player_id_from_element(e);
 	var player = players[player_id];
 	var troops = [];
 	var row, r;
@@ -222,15 +276,23 @@ var click_form_squad = function(e) {
 	}
 }
 
-var click_break_up = function(e) {
+var get_unit_id_from_element = function (e) {
+	var table = e.parentElement.parentElement.parentElement.parentElement;
+	var row = e.parentElement.parentElement;
+	var id = row.rowIndex - 1;
+	return id;
+}
+var get_player_id_from_element = function(e) {
 	var table = e.parentElement.parentElement.parentElement.parentElement;
 	var player_id = table.getAttribute("data-player_id");
-	var player = players[player_id];
-	var row = e.parentElement.parentElement;
-	var squad_id = row.rowIndex - 1;
-	var squad = player.squads[squad_id];
+	return player_id;
+}
 
-	break_up(squad, player_id);
+var click_break_up = function(e) {
+	var player_id = get_player_id_from_element(e);
+	var squad_id = get_unit_id_from_element(e);
+
+	break_up(player_id, squad_id);
 }
 
 

@@ -28,8 +28,8 @@ var flow = function () {
 	players.push(new player());
 	determine_starting_troops(players);
 
-	set_attacker(0,0);
-	set_target(1,0);
+	set_attacker(0, "troop", 0);
+	set_target(1, "troop", 0);
 	simulate_attack();
 
 
@@ -123,6 +123,9 @@ var troop = function () {
 		var pplus = player_id - 0 + 1;
 		var tplus = troop_id - 0 + 1;
 		this.name = "p"+pplus+"-t"+tplus;
+		this.player_id = player_id;
+		this.unit_id = troop_id;
+		this.unit_type = "troop";
 	};
 
 	this.clone = function () {
@@ -149,6 +152,9 @@ var squad = function () {
 		var pplus = player_id - 0 + 1;
 		var splus = squad_id - 0 + 1;
 		this.name = "p"+pplus+"-s"+splus;
+		this.player_id = player_id;
+		this.unit_id = squad_id;
+		this.unit_type = "squad";
 
 		var troop, t;
 		for (t in troops) {
@@ -275,8 +281,10 @@ var roll = function (max) {
 	return Math.floor((Math.random() * max) + 1);
 };
 
-var break_up = function (squad, player_id) {
-	//alert("can not yet break up squads");
+var break_up = function (player_id, squad_id) {
+
+	var player = players[player_id];
+	var squad = player.squads[squad_id];
 
 	var troop, t;
 	for (t = 0; t < squad.troops.length; t++) {
@@ -285,9 +293,8 @@ var break_up = function (squad, player_id) {
 		troop.squad_id = undefined;
 	}
 
-	var player = players[player_id];
 	player.squads.splice(squad.id, 1);
-	
+
 	for (t = 0; t < player.troops.length; t++) {
 		troop = player.troops[t];
 		troop.squad_id = undefined;
@@ -309,7 +316,7 @@ var break_up = function (squad, player_id) {
 
 	populate_troop_table(player_id);
 	populate_squad_table(player_id);
-	//todo: clear demo fight
+	simulate_attack();
 };
 var clone_squad = function (squad){
 	alert("can not yet clone squads");
@@ -349,6 +356,7 @@ var form_squad = function (troops, player_id) {
 
 	populate_troop_table(player_id);
 	populate_squad_table(player_id);
+	simulate_attack();
 };
 var new_troop = function (player_id) {
 	alert("can not yet get new troop");
@@ -370,3 +378,17 @@ var kill_squad = function (squad) {
 	//delete squad
 	//remove squad row
 };
+
+
+var get_unit = function (player_id, unit_type, unit_id) {
+	var player = players[player_id];
+	var unit;
+	if (unit_type == "troop") {
+		unit = player.troops[unit_id];
+	} else if (unit_type == "squad") {
+		unit = player.squads[unit_id];
+	} else {
+		alert("Error: invalid unit type")
+	}
+	return unit;
+}
