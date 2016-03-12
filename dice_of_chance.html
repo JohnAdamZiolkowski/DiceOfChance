@@ -1,133 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><title>Dice of Chance</title> </head>
-<body>
 
-<!-- <h1>My First Web Page</h1>
-<p>My first paragraph.</p> -->
-
-<h3>Player 1 troops</h3>
-<table border=1 id="troop_table0">
-	<tr>
-		<th>name</th>
-		<th>hp</th>
-		<th>attack</th>
-		<th>armour</th>
-		<th>range</th>
-		<th>los</th>
-		<th>agility</th>
-		<th>accuracy</th>
-		<th>speed</th>
-		<th colspan="2">demo fight</th>
-		<th>squad</th>
-		<th><input type="button" value="form squad" onclick=form_squad("NOPE")></input></th>
-		<th><input type="button" value="new troop" onclick=new_troop(0)></input></th>
-	</tr>
-</table>
-
-<h3>Player 1 squads</h3>
-<table border=1 id="squad_table0">
-	<tr>
-		<th>name</th>
-		<th>hp</th>
-		<th>attack</th>
-		<th>armour</th>
-		<th>range</th>
-		<th>los</th>
-		<th>agility</th>
-		<th>accuracy</th>
-		<th>speed</th>
-		<th colspan="2">demo fight</th>
-		<th>troops</th>
-		<th>break up</th>
-		<th>clone</th>
-	</tr>
-<!-- 	<tr>
-		<td>p1-s1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td><input type="button" value="attacker"></input></td>
-		<td><input type="button" value="target"></input></td>
-		<td>3</td>
-		<td><input type="button" value="break up"></input></td>
-		<td><input type="button" value="clone"></input></td>
-	</tr> -->
-</table>
-
-
-<h3>Player 2 troops</h3>
-<table border=1 id="troop_table1">
-	<tr>
-		<th>name</th>
-		<th>hp</th>
-		<th>attack</th>
-		<th>armour</th>
-		<th>range</th>
-		<th>los</th>
-		<th>agility</th>
-		<th>accuracy</th>
-		<th>speed</th>
-		<th colspan="2">demo fight</th>
-		<th>squad</th>
-		<th><input type="button" value="form squad" onclick=form_squad("NOPE")></input></th>
-		<th><input type="button" value="new troop" onclick=new_troop(1)></input></th>
-	</tr>
-</table>
-
-<h3>Player 2 squads</h3>
-<table border=1 id="squad_table1">
-	<tr>
-		<th>name</th>
-		<th>hp</th>
-		<th>attack</th>
-		<th>armour</th>
-		<th>range</th>
-		<th>los</th>
-		<th>agility</th>
-		<th>accuracy</th>
-		<th>speed</th>
-		<th colspan="2">demo fight</th>
-		<th>troops</th>
-		<th>break up</th>
-		<th>clone</th>
-	</tr>
-<!-- 	<tr>
-		<td>p1-s1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td>1</td>
-		<td><input type="button" value="attacker"></input></td>
-		<td><input type="button" value="target"></input></td>
-		<td>3</td>
-		<td><input type="button" value="break up"></input></td>
-		<td><input type="button" value="clone"></input></td>
-	</tr> -->
-</table>
-
-<h3>Demo fight:</h3>
-<h4 id="battle_label">Player 1 troop #1 attacks Player 2's troop #4</h4>
-<!-- <h5>P1T1 misses</h5>
-<h5>P1T1 does 0 damage to P2T4</h5>
-<h5>P2T4 lives on with 4 HP</h5>
-<h5>P2T4 dies.</h5> -->
-
-
-<script src="frontend.js"> </script>
-<script src="backend.js"> </script>
-<script type="text/javascript">
-flow()
-</script>
 
 <style type="text/css">
 td {
@@ -141,5 +15,96 @@ table {
 </style>
 
 
+<body>
+
+<!-- <h1>My First Web Page</h1>
+<p>My first paragraph.</p> -->
+
+<h3>Player 1 troops</h3>
+<table border=1 id="troop_table0" data-player_id=0>
+	<tr>
+		<th>name</th>
+		<th>hp</th>
+		<th>attack</th>
+		<th>armour</th>
+		<th>range</th>
+		<th>los</th>
+		<th>agility</th>
+		<th>accuracy</th>
+		<th>speed</th>
+		<th colspan="2">demo fight</th>
+		<th>squad</th>
+		<th><input type="button" value="form squad" onclick=click_form_squad(this)></input></th>
+		<th><input type="button" value="new troop" onclick=new_troop(0)></input></th>
+	</tr>
+</table>
+
+<h3>Player 1 squads</h3>
+<table border=1 id="squad_table0" data-player_id=0>
+	<tr>
+		<th>name</th>
+		<th>hp</th>
+		<th>attack</th>
+		<th>armour</th>
+		<th>range</th>
+		<th>los</th>
+		<th>agility</th>
+		<th>accuracy</th>
+		<th>speed</th>
+		<th colspan="2">demo fight</th>
+		<th>troops</th>
+		<th>break up</th>
+		<th>clone</th>
+	</tr>
+</table>
+
+
+<h3>Player 2 troops</h3>
+<table border=1 id="troop_table1" data-player_id=1>
+	<tr>
+		<th>name</th>
+		<th>hp</th>
+		<th>attack</th>
+		<th>armour</th>
+		<th>range</th>
+		<th>los</th>
+		<th>agility</th>
+		<th>accuracy</th>
+		<th>speed</th>
+		<th colspan="2">demo fight</th>
+		<th>squad</th>
+		<th><input type="button" value="form squad" onclick=click_form_squad(this)></input></th>
+		<th><input type="button" value="new troop" onclick=new_troop(1)></input></th>
+	</tr>
+</table>
+
+<h3>Player 2 squads</h3>
+<table border=1 id="squad_table1" data-player_id=1>
+	<tr>
+		<th>name</th>
+		<th>hp</th>
+		<th>attack</th>
+		<th>armour</th>
+		<th>range</th>
+		<th>los</th>
+		<th>agility</th>
+		<th>accuracy</th>
+		<th>speed</th>
+		<th colspan="2">demo fight</th>
+		<th>troops</th>
+		<th>break up</th>
+		<th>clone</th>
+	</tr>
+</table>
+
+<h3>Demo fight:</h3>
+<h4 id="battle_label"></h4>
+
+
+<script src="frontend.js"> </script>
+<script src="backend.js"> </script>
+<script type="text/javascript">
+	flow()
+</script>
 </body>
 </html> 

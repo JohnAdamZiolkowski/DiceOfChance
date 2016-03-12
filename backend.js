@@ -72,19 +72,18 @@ var determine_starting_troops = function (players) {
 			player.troops.push(new_troop);
 		}
 		player.squads = [];
-		if (player.troops.length > 1) {
-			var new_squad = new squad();
-			var squad_troops = [];
-			squad_troops.push(player.troops[0]);
-			squad_troops.push(player.troops[1]);
-			new_squad.recalculate(squad_troops, p, 0);
-			player.squads.push(new_squad);
-		}
+		// if (player.troops.length > 1) {
+		// 	var new_squad = new squad();
+		// 	var squad_troops = [];
+		// 	squad_troops.push(player.troops[0]);
+		// 	squad_troops.push(player.troops[1]);
+		// 	new_squad.recalculate(squad_troops, p, 0);
+		// 	player.squads.push(new_squad);
+		// }
 
 		populate_troop_table(p);
 		populate_squad_table(p);
 	}
-	console.log(players);
 	//do something
 };
 
@@ -187,17 +186,17 @@ var squad = function () {
 		var attack_bonus;
 		var range_bonus;
 
-		if (troops.length = 2) {
+		if (troops.length == 2) {
 			speed_bonus = - 1;
 			agility_bonus = - 1;
 			attack_bonus = + 1;
 			range_bonus = + 1;
-		} else if (troops.length = 3) {
+		} else if (troops.length == 3) {
 			speed_bonus = - 1;
 			agility_bonus = - 1;
 			attack_bonus = + 2;
 			range_bonus = + 1;
-		} else if (troops.length = 4) {
+		} else if (troops.length == 4) {
 			speed_bonus = - 2;
 			agility_bonus = - 1;
 			attack_bonus = + 2;
@@ -276,13 +275,37 @@ var roll = function (max) {
 	return Math.floor((Math.random() * max) + 1);
 };
 
-var break_up = function (squad) {
-	alert("can not yet break up squads");
-	//remove squad from player squads
-	//remove row from table
-	//update affected troop rows
-	//clear demo fight
-	//update affected squad rows (id, name)
+var break_up = function (squad, player_id) {
+	//alert("can not yet break up squads");
+
+	var troop, t;
+	for (t = 0; t < squad.troops.length; t++) {
+		troop = squad.troops[t];
+
+		troop.squad_id = undefined;
+	}
+
+	var player = players[player_id];
+	console.log(player.squads);
+	player.squads.splice(squad.id, 1);
+	console.log(player.squads);
+
+	var squads = player.squads;
+	var squad, s;
+	for (s = 0; s < squads.length; s++) {
+		squad = squads[s];
+		squad.recalculate(squad.troops, player_id, s);
+
+		//todo: move into recalculate
+		for (t = 0; t < squad.troops.length; t++) {
+			troop = squad.troops[t];
+			troop.squad_id = s;
+		}
+	}
+
+	populate_troop_table(player_id);
+	populate_squad_table(player_id);
+	//todo: clear demo fight
 };
 var clone_squad = function (squad){
 	alert("can not yet clone squads");
@@ -300,14 +323,28 @@ var clone_troop = function (troop) {
 	//add to player troop
 	//add row to troop table
 };
-var form_squad = function (troops) {
-	alert("can not yet form squads");
-	//check to see if 2-4 are selected
-	//create squad
-	//update affected troop rows
-	//disable buttons, checkboxes, update text
-	//add squad to player squads
-	//add row to squad table
+var form_squad = function (troops, player_id) {
+	var new_squad = new squad();
+	var player = players[player_id];
+	var squad_id = player.squads.length;
+	new_squad.recalculate(troops, player_id, squad_id);
+
+	var troop, t;
+	for (t = 0; t < troops.length; t++) {
+		troop = troops[t];
+
+		if (troop.squad_id == undefined)
+			troop.squad_id = squad_id;
+		else {
+			alert("Troops can not form two squads");
+			return false;
+		}
+	}
+
+	player.squads.push(new_squad);
+
+	populate_troop_table(player_id);
+	populate_squad_table(player_id);
 };
 var new_troop = function (player_id) {
 	alert("can not yet get new troop");

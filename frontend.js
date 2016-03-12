@@ -6,8 +6,15 @@ var color_cell = function (cell, value) {
 
 var populate_troop_table = function (player_id) {
 	var table = document.getElementById("troop_table"+player_id);
+	
+	var row, r;
+	for (r = 1; r < table.rows.length;) {
+		table.deleteRow(r);
+	}
+
 	for (t in players[player_id].troops) {
-		var troop = players[player_id].troops[t];
+		var player = players[player_id];
+		var troop = player.troops[t];
 		var row = table.insertRow(-1);
 		var cell = row.insertCell(-1);
 		cell.innerHTML = troop.name
@@ -28,11 +35,21 @@ var populate_troop_table = function (player_id) {
 		var cell = row.insertCell(-1);
 		color_cell(cell, troop.speed);
 
+		var in_squad = troop.squad_id;
+		var squad_name;
+		if (in_squad == undefined) {
+			squad_name = "none";
+		} else {
+			squad_name = player.squads[troop.squad_id].name;
+		}
+
 		var cell = row.insertCell(-1);
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "attacker";
 		button.onclick = function () {attacker(troop)};
+		if (in_squad != undefined)
+			button.disabled = "disabled";
 		cell.appendChild(button);
 
 		var cell = row.insertCell(-1);
@@ -40,24 +57,39 @@ var populate_troop_table = function (player_id) {
 		button.type = "button";
 		button.value = "target";
 		button.onclick = function () {target(troop)};
+		if (in_squad != undefined)
+			button.disabled = "disabled";
 		cell.appendChild(button);
 
 		var cell = row.insertCell(-1);
-		cell.innerHTML = "none";
+		cell.innerHTML = squad_name;
+
 		var cell = row.insertCell(-1);
-		cell.innerHTML = "<input type='checkbox'></input>";
+		var checkbox = document.createElement("input");
+		checkbox.type = "checkbox";
+		if (in_squad != undefined)
+			checkbox.disabled = "disabled";
+		cell.appendChild(checkbox);
 
 		var cell = row.insertCell(-1);
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "clone";
 		button.onclick = function () {clone_troop(troop)};
+		if (in_squad != undefined)
+			button.disabled = "disabled";
 		cell.appendChild(button);
 	}
 };
 
 var populate_squad_table = function (player_id) {
 	var table = document.getElementById("squad_table"+player_id);
+
+	var row, r;
+	for (r = 1; r < table.rows.length;) {
+		table.deleteRow(r);
+	}
+
 	for (s in players[player_id].squads) {
 		var squad = players[player_id].squads[s];
 		var row = table.insertRow(-1);
@@ -101,7 +133,7 @@ var populate_squad_table = function (player_id) {
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "break up";
-		button.onclick = function () {break_up(squad)};
+		button.onclick = function () {click_break_up(this)};
 		cell.appendChild(button);
 
 		var cell = row.insertCell(-1);
@@ -164,3 +196,41 @@ var simulate_attack = function () {
 	}
 
 };
+
+
+var click_form_squad = function(e) {
+	var table = e.parentElement.parentElement.parentElement.parentElement;
+
+	//todo: fix, get from table
+	var player_id = table.getAttribute("data-player_id");
+	var player = players[player_id];
+	var troops = [];
+	var row, r;
+	for (r = 1; r < table.rows.length; r++) {
+		row = table.rows[r];
+		//todo: fix
+		var checkbox = row.cells[12].firstChild;
+		if (checkbox.checked) {
+			troops.push(player.troops[r-1]);
+		}
+	}
+
+	if (troops.length < 2 || troops.length > 4 ) {
+		alert("Squads must be made of 2, 3, or 4 troops.");
+	} else {
+		form_squad(troops, player_id);
+	}
+}
+
+var click_break_up = function(e) {
+	var table = e.parentElement.parentElement.parentElement.parentElement;
+	var player_id = table.getAttribute("data-player_id");
+	var player = players[player_id];
+	var row = e.parentElement.parentElement;
+	var squad_id = row.rowIndex - 1;
+	var squad = player.squads[squad_id];
+
+	break_up(squad, player_id);
+}
+
+
