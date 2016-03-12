@@ -286,9 +286,12 @@ var break_up = function (squad, player_id) {
 	}
 
 	var player = players[player_id];
-	console.log(player.squads);
 	player.squads.splice(squad.id, 1);
-	console.log(player.squads);
+	
+	for (t = 0; t < player.troops.length; t++) {
+		troop = player.troops[t];
+		troop.squad_id = undefined;
+	}
 
 	var squads = player.squads;
 	var squad, s;
@@ -302,6 +305,7 @@ var break_up = function (squad, player_id) {
 			troop.squad_id = s;
 		}
 	}
+
 
 	populate_troop_table(player_id);
 	populate_squad_table(player_id);
