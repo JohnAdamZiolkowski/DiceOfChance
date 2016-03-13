@@ -319,3 +319,10 @@ var click_clone_troop = function (e) {
 
 	clone_troop(player_id, troop_id);
 };
+
+var click_clone_squad = function (e) {
+	var player_id = get_player_id_from_element(e);
+	var squad_id = get_unit_id_from_element(e);
+
+	clone_squad(player_id, squad_id);
+};

@@ -320,15 +320,28 @@ var clone_troop = function (player_id, troop_id) {
 	populate_troop_table(player_id);
 };
 
-var clone_squad = function (squad) {
-	alert("can not yet clone squads");
-	//clone troops in squad
-	//add to player troops
-	//add rows to troop table
-	//clone squad, but with new troops
-	//add to player squads
-	//add row to squad table
+var clone_squad = function (player_id, squad_id) {
+	var player = players[player_id];
+	var squad = player.squads[squad_id];
+	var new_squad_id = player.squads.length;
+	var squad_troops = squad.troops;
 
+	var new_troops = [];
+
+	var squad_troop, t;
+	for (t = 0; t < squad_troops.length; t++) {
+		//clone troops in squad
+		squad_troop = squad_troops[t];
+		var squad_troop_id = squad_troop.unit_id;
+		clone_troop(player_id, squad_troop_id);
+
+		//add new troops to a squad
+		var new_troop_id = player.troops.length-1;
+		new_troops.push(player.troops[new_troop_id]);
+	}
+
+	//create squad with cloned troops
+	form_squad(new_troops, player_id);
 };
 
 var form_squad = function (troops, player_id) {
