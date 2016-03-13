@@ -8,14 +8,24 @@ td {
 	text-align: center;
 	width: 7.124286%;
 }
+th {
+	text-align: center;
+	width: 7.124286%;
+}
+th#double {
+	width: 14.248572%;
+}
 table {
 	width: 100%;
+}
+* {
+	font-family: Calibri;
 }
 
 </style>
 
 
-<body>
+<body bgcolor="#CDE">
 
 <!-- <h1>My First Web Page</h1>
 <p>My first paragraph.</p> -->
@@ -32,10 +42,10 @@ table {
 		<th>agility</th>
 		<th>accuracy</th>
 		<th>speed</th>
-		<th colspan="2">demo fight</th>
+		<th id="double" colspan="2">demo fight</th>
 		<th>squad</th>
 		<th><input type="button" value="form squad" onclick=click_form_squad(this)></input></th>
-		<th><input type="button" value="new troop" onclick=new_troop(0)></input></th>
+		<th><input type="button" value="new troop" onclick=click_new_troop(this)></input></th>
 	</tr>
 </table>
 
@@ -51,10 +61,10 @@ table {
 		<th>agility</th>
 		<th>accuracy</th>
 		<th>speed</th>
-		<th colspan="2">demo fight</th>
+		<th id="double" colspan="2">demo fight</th>
 		<th>troops</th>
 		<th>break up</th>
-		<th>clone</th>
+		<th><input type="button" value="new squad" onclick=click_new_squad(this)></input></th>
 	</tr>
 </table>
 
@@ -71,10 +81,10 @@ table {
 		<th>agility</th>
 		<th>accuracy</th>
 		<th>speed</th>
-		<th colspan="2">demo fight</th>
+		<th id="double" colspan="2">demo fight</th>
 		<th>squad</th>
 		<th><input type="button" value="form squad" onclick=click_form_squad(this)></input></th>
-		<th><input type="button" value="new troop" onclick=new_troop(1)></input></th>
+		<th><input type="button" value="new troop" onclick=click_new_troop(this)></input></th>
 	</tr>
 </table>
 
@@ -90,10 +100,10 @@ table {
 		<th>agility</th>
 		<th>accuracy</th>
 		<th>speed</th>
-		<th colspan="2">demo fight</th>
+		<th id="double" colspan="2">demo fight</th>
 		<th>troops</th>
 		<th>break up</th>
-		<th>clone</th>
+		<th><input type="button" value="new squad" onclick=click_new_squad(this)></input></th>
 	</tr>
 </table>
 

@@ -358,11 +358,37 @@ var form_squad = function (troops, player_id) {
 	populate_squad_table(player_id);
 	simulate_attack();
 };
+
 var new_troop = function (player_id) {
-	alert("can not yet get new troop");
-	//create troop
-	//add to player troops
-	//add row to troop table
+	var player = players[player_id];
+	var troop_id = player.troops.length;
+
+	//make a new troop
+	var new_troop = new troop();
+	new_troop.initialize(player_id, troop_id);
+
+	//add it to the player's team
+	player.troops.push(new_troop);
+
+	//update the ui
+	populate_troop_table(player_id);
+};
+
+var new_squad = function (player_id, size) {
+	var player = players[player_id];
+	var squad_id = player.squads.length;
+
+	var new_troops = [];
+	var t; 
+	for (t = 0; t < size; t++) {
+		new_troop(player_id);
+		var new_troop_id = player.troops.length-1;
+		new_troops.push(player.troops[new_troop_id]);
+	}
+
+	form_squad(new_troops, player_id);
+	populate_troop_table(player_id);
+	populate_squad_table(player_id);
 };
 
 var kill_troop = function (squad) {
@@ -379,7 +405,6 @@ var kill_squad = function (squad) {
 	//remove squad row
 };
 
-
 var get_unit = function (player_id, unit_type, unit_id) {
 	var player = players[player_id];
 	var unit;
@@ -391,4 +416,4 @@ var get_unit = function (player_id, unit_type, unit_id) {
 		alert("Error: invalid unit type")
 	}
 	return unit;
-}
+};

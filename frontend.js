@@ -162,12 +162,12 @@ var populate_squad_table = function (player_id) {
 
 var demo = {};
 
-var attacker = function(player_id, type, id) {
+var attacker = function (player_id, type, id) {
 	set_attacker(player_id, type, id);
 	check_target();
 	simulate_attack();
 };
-var target = function(player_id, type, id) {
+var target = function (player_id, type, id) {
 	set_target(player_id, type, id);
 	check_attacker();
 	simulate_attack();
@@ -202,10 +202,10 @@ var check_target = function () {
 	return true;
 }
 
-var set_attacker = function(player_id, type, id) {
+var set_attacker = function (player_id, type, id) {
 	demo.attacker = get_unit(player_id, type, id);
 };
-var set_target = function(player_id, type, id) {
+var set_target = function (player_id, type, id) {
 	demo.target = get_unit(player_id, type, id);
 };
 
@@ -253,7 +253,7 @@ var simulate_attack = function () {
 };
 
 
-var click_form_squad = function(e) {
+var click_form_squad = function (e) {
 	var table = e.parentElement.parentElement.parentElement.parentElement;
 
 	var player_id = get_player_id_from_element(e);
@@ -269,30 +269,46 @@ var click_form_squad = function(e) {
 		}
 	}
 
-	if (troops.length < 2 || troops.length > 4 ) {
+	if (troops.length < 2 || troops.length > 4) {
 		alert("Squads must be made of 2, 3, or 4 troops.");
 	} else {
 		form_squad(troops, player_id);
 	}
-}
+};
 
 var get_unit_id_from_element = function (e) {
 	var table = e.parentElement.parentElement.parentElement.parentElement;
 	var row = e.parentElement.parentElement;
 	var id = row.rowIndex - 1;
 	return id;
-}
-var get_player_id_from_element = function(e) {
+};
+
+var get_player_id_from_element = function (e) {
 	var table = e.parentElement.parentElement.parentElement.parentElement;
 	var player_id = table.getAttribute("data-player_id");
 	return player_id;
-}
+};
 
-var click_break_up = function(e) {
+var click_break_up = function (e) {
 	var player_id = get_player_id_from_element(e);
 	var squad_id = get_unit_id_from_element(e);
 
 	break_up(player_id, squad_id);
-}
+};
 
+var click_new_troop = function (e) {
+	var player_id = get_player_id_from_element(e);
+	new_troop(player_id);
+};
 
+var click_new_squad = function (e) {
+	var player_id = get_player_id_from_element(e);
+
+	var size = prompt("How many troops? 2, 3, or 4");
+	size = parseInt(size);
+	if (size < 2 || size > 4) {
+		alert("Squads must be made of 2, 3, or 4 troops.");
+	} else {
+		new_squad(player_id, size);
+	}
+};
