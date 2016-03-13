@@ -84,7 +84,7 @@ var populate_troop_table = function (player_id) {
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "clone";
-		button.onclick = function () {clone_troop(troop)};
+		button.onclick = function () {click_clone_troop(this)};
 		if (in_squad != undefined)
 			button.disabled = "disabled";
 		cell.appendChild(button);
@@ -155,7 +155,7 @@ var populate_squad_table = function (player_id) {
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = "clone";
-		button.onclick = function () {clone_squad(squad)};
+		button.onclick = function () {click_clone_squad(this)};
 		cell.appendChild(button);
 	}
 };
@@ -298,7 +298,7 @@ var click_break_up = function (e) {
 
 var click_new_troop = function (e) {
 	var player_id = get_player_id_from_element(e);
-	new_troop(player_id);
+	make_new_troop(player_id);
 };
 
 var click_new_squad = function (e) {
@@ -309,6 +309,13 @@ var click_new_squad = function (e) {
 	if (size < 2 || size > 4) {
 		alert("Squads must be made of 2, 3, or 4 troops.");
 	} else {
-		new_squad(player_id, size);
+		make_new_squad(player_id, size);
 	}
+};
+
+var click_clone_troop = function (e) {
+	var player_id = get_player_id_from_element(e);
+	var troop_id = get_unit_id_from_element(e);
+
+	clone_troop(player_id, troop_id);
 };

@@ -72,14 +72,6 @@ var determine_starting_troops = function (players) {
 			player.troops.push(new_troop);
 		}
 		player.squads = [];
-		// if (player.troops.length > 1) {
-		// 	var new_squad = new squad();
-		// 	var squad_troops = [];
-		// 	squad_troops.push(player.troops[0]);
-		// 	squad_troops.push(player.troops[1]);
-		// 	new_squad.recalculate(squad_troops, p, 0);
-		// 	player.squads.push(new_squad);
-		// }
 
 		populate_troop_table(p);
 		populate_squad_table(p);
@@ -102,8 +94,6 @@ var troop = function () {
 
 	this.speed;				//travel distance, taxicab
 
-	this.can_form_squad;
-
 	this.position = {};
 	this.position.x;
 	this.position.y;
@@ -118,7 +108,6 @@ var troop = function () {
 		this.agility = roll(10);
 		this.accuracy = roll(10);
 		this.speed = roll(10);
-		this.can_form_squad = false;
 
 		var pplus = player_id - 0 + 1;
 		var tplus = troop_id - 0 + 1;
@@ -128,18 +117,15 @@ var troop = function () {
 		this.unit_type = "troop";
 	};
 
-	this.clone = function () {
-		var cloned_troop = new troop();
-		cloned_troop.hit_points = troop.hit_points;
-		cloned_troop.attack = troop.attack;
-		cloned_troop.armour = troop.armour;
-		cloned_troop.range = troop.range;
-		cloned_troop.line_of_sight = troop.line_of_sight;
-		cloned_troop.agility = troop.agility;
-		cloned_troop.accuracy = troop.accuracy;
-		cloned_troop.speed = troop.speed;
-		cloned_troop.can_form_squad = false;
-		return cloned_troop;
+	this.clone = function (troop) {
+		this.hit_points = troop.hit_points;
+		this.attack = troop.attack;
+		this.armour = troop.armour;
+		this.range = troop.range;
+		this.line_of_sight = troop.line_of_sight;
+		this.agility = troop.agility;
+		this.accuracy = troop.accuracy;
+		this.speed = troop.speed;
 	};
 };
 
@@ -313,12 +299,28 @@ var break_up = function (player_id, squad_id) {
 		}
 	}
 
-
 	populate_troop_table(player_id);
 	populate_squad_table(player_id);
 	simulate_attack();
 };
-var clone_squad = function (squad){
+
+var clone_troop = function (player_id, troop_id) {
+	var player = players[player_id];
+	var troop = player.troops[troop_id];
+	var new_troop_id = player.troops.length;
+
+	//create new troop
+	make_new_troop(player_id);
+	var new_troop = player.troops[new_troop_id];
+
+	//clone stats over from old troop
+	new_troop.clone(troop);
+
+	//add row to troop table
+	populate_troop_table(player_id);
+};
+
+var clone_squad = function (squad) {
 	alert("can not yet clone squads");
 	//clone troops in squad
 	//add to player troops
@@ -328,12 +330,7 @@ var clone_squad = function (squad){
 	//add row to squad table
 
 };
-var clone_troop = function (troop) {
-	alert("can not yet clone troops");
-	//clone troop
-	//add to player troop
-	//add row to troop table
-};
+
 var form_squad = function (troops, player_id) {
 	var new_squad = new squad();
 	var player = players[player_id];
@@ -359,7 +356,7 @@ var form_squad = function (troops, player_id) {
 	simulate_attack();
 };
 
-var new_troop = function (player_id) {
+var make_new_troop = function (player_id) {
 	var player = players[player_id];
 	var troop_id = player.troops.length;
 
@@ -374,14 +371,14 @@ var new_troop = function (player_id) {
 	populate_troop_table(player_id);
 };
 
-var new_squad = function (player_id, size) {
+var make_new_squad = function (player_id, size) {
 	var player = players[player_id];
 	var squad_id = player.squads.length;
 
 	var new_troops = [];
 	var t; 
 	for (t = 0; t < size; t++) {
-		new_troop(player_id);
+		make_new_troop(player_id);
 		var new_troop_id = player.troops.length-1;
 		new_troops.push(player.troops[new_troop_id]);
 	}
