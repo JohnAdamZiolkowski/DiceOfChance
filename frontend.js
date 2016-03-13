@@ -304,9 +304,11 @@ var click_new_troop = function (e) {
 var click_new_squad = function (e) {
 	var player_id = get_player_id_from_element(e);
 
-	var size = prompt("How many troops? 2, 3, or 4");
+	var size = prompt("How many troops - 2, 3, or 4?");
 	size = parseInt(size);
-	if (size < 2 || size > 4) {
+	if (isNaN(size)) {
+		alert("Invalid number.  Try again.");
+	} else if (size < 2 || size > 4) {
 		alert("Squads must be made of 2, 3, or 4 troops.");
 	} else {
 		make_new_squad(player_id, size);
