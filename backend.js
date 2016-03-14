@@ -33,32 +33,52 @@ var flow = function () {
 	simulate_attack();
 
 
-	//round
-		//turn
-		//for each player:
+	while (true) {
+
+		var player_in_turn, p;
+		for (p = 0; p < players.length; p++) {
+			player_in_turn = players[p];
+
+			//take turn
+
 			//reinforcements, roll(10)
+			player_in_turn.reinforcement_points = roll(10);
+			update_player_reinforcements(p);
+
 			//initiative, roll(10) 
+			player_in_turn.initiative_points = roll(10);
+			update_player_initiative(p);
+
+			//DONE:
 			//enable troops to form squads
 			//decide on clones
 				//decide number of clones
 				//decide which troop is cloned
 			//initialize new troops
 			//A: make / break up squads
+			
+			//todo:
 			//B: move units
 			//C: attack
 			//D: throw grenades
 			//E: end turn
 
 			//check to see if game is over
+		}
 
+		//todo: remove
+		break;
+	}
+	
 	//end game
-
 };
 
 
 var player = function () {
 	this.troops;
 	this.squads;
+	this.reinforcement_points;
+	this.initiative_points;
 };
 
 var determine_starting_troops = function (players) {
@@ -304,13 +324,22 @@ var break_up = function (player_id, squad_id) {
 	simulate_attack();
 };
 
-var clone_troop = function (player_id, troop_id) {
+var clone_troop = function (player_id, troop_id, paid) {
 	var player = players[player_id];
 	var troop = player.troops[troop_id];
 	var new_troop_id = player.troops.length;
 
+	if (! paid) {
+		var cost = 2;
+		if (player.reinforcement_points < cost) {
+			alert("Not enough reinforcement points. " + cost + " are needed to clone this troop.");
+			return;
+		}
+		player.reinforcement_points -= cost;
+	}
+
 	//create new troop
-	make_new_troop(player_id);
+	make_new_troop(player_id, true);
 	var new_troop = player.troops[new_troop_id];
 
 	//clone stats over from old troop
@@ -318,6 +347,7 @@ var clone_troop = function (player_id, troop_id) {
 
 	//add row to troop table
 	populate_troop_table(player_id);
+	update_player_reinforcements(player_id);
 };
 
 var clone_squad = function (player_id, squad_id) {
@@ -326,6 +356,13 @@ var clone_squad = function (player_id, squad_id) {
 	var new_squad_id = player.squads.length;
 	var squad_troops = squad.troops;
 
+	var cost = squad.troops.length * 2;
+	if (player.reinforcement_points < cost) {
+		alert("Not enough reinforcement points.  " + cost + " are needed to clone this squad.");
+		return;
+	}
+	player.reinforcement_points -= cost;
+
 	var new_troops = [];
 
 	var squad_troop, t;
@@ -333,7 +370,7 @@ var clone_squad = function (player_id, squad_id) {
 		//clone troops in squad
 		squad_troop = squad_troops[t];
 		var squad_troop_id = squad_troop.unit_id;
-		clone_troop(player_id, squad_troop_id);
+		clone_troop(player_id, squad_troop_id, true);
 
 		//add new troops to a squad
 		var new_troop_id = player.troops.length-1;
@@ -369,9 +406,18 @@ var form_squad = function (troops, player_id) {
 	simulate_attack();
 };
 
-var make_new_troop = function (player_id) {
+var make_new_troop = function (player_id, paid) {
 	var player = players[player_id];
 	var troop_id = player.troops.length;
+
+	if (! paid) {
+		var cost = 1;
+		if (player.reinforcement_points < cost) {
+			alert("Not enough reinforcement points.  " + cost + " is needed to train a new troop.");
+			return;
+		}
+		player.reinforcement_points -= cost;
+	}
 
 	//make a new troop
 	var new_troop = new troop();
@@ -382,16 +428,24 @@ var make_new_troop = function (player_id) {
 
 	//update the ui
 	populate_troop_table(player_id);
+	update_player_reinforcements(player_id);
 };
 
 var make_new_squad = function (player_id, size) {
 	var player = players[player_id];
 	var squad_id = player.squads.length;
 
+	var cost = size;
+	if (player.reinforcement_points < cost) {
+		alert("Not enough reinforcement points.  " + cost + " are needed to train a new squad of that size.");
+		return;
+	}
+	player.reinforcement_points -= cost;
+
 	var new_troops = [];
 	var t; 
 	for (t = 0; t < size; t++) {
-		make_new_troop(player_id);
+		make_new_troop(player_id, true);
 		var new_troop_id = player.troops.length-1;
 		new_troops.push(player.troops[new_troop_id]);
 	}

@@ -27,7 +27,9 @@ table {
 
 <body bgcolor="#ABC">
 
-<h3>Player 1 troops</h3>
+<h3 id="player_initiative0" data-player_id=0>Player 1 initiative:</h3>
+<h3 id="player_reinforcements0" data-player_id=0>Player 1 reinforcement points:</h3>
+<h3>Player 1 troops:</h3>
 <table border=1 id="troop_table0" data-player_id=0>
 	<tr>
 		<th>name</th>
@@ -46,7 +48,7 @@ table {
 	</tr>
 </table>
 
-<h3>Player 1 squads</h3>
+<h3>Player 1 squads:</h3>
 <table border=1 id="squad_table0" data-player_id=0>
 	<tr>
 		<th>name</th>
@@ -65,8 +67,12 @@ table {
 	</tr>
 </table>
 
+<br />
+<hr />
 
-<h3>Player 2 troops</h3>
+<h3 id="player_initiative1" data-player_id=1>Player 2 initiative:</h3>
+<h3 id="player_reinforcements1" data-player_id=1>Player 2 reinforcement points:</h3>
+<h3>Player 2 troops:</h3>
 <table border=1 id="troop_table1" data-player_id=1>
 	<tr>
 		<th>name</th>
@@ -85,7 +91,7 @@ table {
 	</tr>
 </table>
 
-<h3>Player 2 squads</h3>
+<h3>Player 2 squads:</h3>
 <table border=1 id="squad_table1" data-player_id=1>
 	<tr>
 		<th>name</th>
@@ -103,6 +109,9 @@ table {
 		<th><input type="button" value="new squad" onclick=click_new_squad(this)></input></th>
 	</tr>
 </table>
+
+<br />
+<hr />
 
 <h3>Demo fight:</h3>
 <h4 id="battle_label"></h4>

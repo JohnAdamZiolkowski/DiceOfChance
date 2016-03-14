@@ -328,3 +328,16 @@ var click_clone_squad = function (e) {
 
 	clone_squad(player_id, squad_id);
 };
+
+
+var update_player_initiative = function (player_id) {
+	var player = players[player_id];
+	var label = document.getElementById("player_initiative"+player_id);
+	label.innerHTML = "Player " + (player_id  - 0 + 1) + " initiative points: " + player.initiative_points;
+};
+
+var update_player_reinforcements = function (player_id) {
+	var player = players[player_id];
+	var label = document.getElementById("player_reinforcements"+player_id);
+	label.innerHTML = "Player " + (player_id - 0 + 1) + " reinforcement points: " + player.reinforcement_points;
+};
