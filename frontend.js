@@ -341,3 +341,107 @@ var update_player_reinforcements = function (player_id) {
 	var label = document.getElementById("player_reinforcements"+player_id);
 	label.innerHTML = "Player " + (player_id - 0 + 1) + " reinforcement points: " + player.reinforcement_points;
 };
+
+var set_up_grenade_table = function () {
+	var table = document.getElementById("grenade_table");
+
+	var row, r;
+	for (r = 0; r < 3; r++) {
+		var row = table.insertRow(-1);
+
+		var cell, c;
+		for (c = 0; c < 3; c++) {
+			var cell = row.insertCell(-1);
+			cell.style.width = "33%";
+			cell.style.height = "33%";
+
+			if (r == 1 && c == 1) {
+				cell.innerHTML = "Target Enemy";
+			} else {
+				var input = document.createElement("input");
+				input.type = "checkbox";
+				input.value = "Enemy";
+				cell.appendChild(input);
+			}
+		}
+	}
+
+};
+
+var click_throw_grenade = function () {
+	var table = document.getElementById("grenade_table");
+
+	var will_hit = [];
+	var might_hit = [];
+	var empty_spaces = [];
+
+	var row, r;
+	for (r = 0; r < 3; r++) {
+		var row = table.rows[r];
+
+		var cell, c;
+		for (c = 0; c < 3; c++) {
+			var cell = row.cells[c];
+			cell.style.backgroundColor = "#8F8";
+
+			var card = {col:c, row:r};
+			if (r == 1 && c == 1) {
+				will_hit.push(card);
+			} else {
+				var input = cell.firstChild;
+				if (input.checked) {
+					might_hit.push(card);
+				} else {
+					empty_spaces.push(card);
+				}
+			}
+		}
+	}
+
+	var hits = roll(8);
+
+	shuffleArray(might_hit);
+	shuffleArray(empty_spaces);
+
+	var enemy_hits;
+
+	if (hits == 0) {
+		//don't do anything
+		enemy_hits = 0;
+	} else if (hits > might_hit.length) {
+		//add all might hit to will hit
+		will_hit = will_hit.concat(might_hit);
+		//add remainder number of empty spaces to will hit
+		var will_hit_empty_spaces = empty_spaces.slice(0, hits - might_hit.length);
+
+		enemy_hits = will_hit.length;
+		will_hit = will_hit.concat(will_hit_empty_spaces);
+	} else if (hits == might_hit.length) {
+		//add all might hit to will hit
+		will_hit = will_hit.concat(might_hit);
+		enemy_hits = will_hit.length;
+
+	} else if (hits < might_hit.length) {
+		//add the first few might hit to will hit
+		var will_hit_enemy_spaces = might_hit.slice(0, hits - might_hit.length);
+
+		will_hit = will_hit.concat(will_hit_enemy_spaces);
+		enemy_hits = will_hit.length;
+
+	}
+
+	var hit, h;
+	for (h = 0; h < will_hit.length; h++) {
+		hit = will_hit[h];
+		var cell = table.rows[hit.row].cells[hit.col];
+		cell.style.backgroundColor = "#F88";
+	}
+
+	var grenade_label = document.getElementById("grenade_label");
+	grenade_label.innerHTML = "" + might_hit.length + " surrounding enemies<br />";
+	grenade_label.innerHTML += " player rolled " + hits + "<br />";
+	grenade_label.innerHTML += enemy_hits - 1 + " of them were hit";
+
+
+};
+

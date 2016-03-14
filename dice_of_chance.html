@@ -18,6 +18,10 @@ th#double {
 table {
 	width: 100%;
 }
+table#grenade_table {
+	width: 150px;
+	height: 150px;
+}
 * {
 	font-family: Calibri;
 }
@@ -117,10 +121,31 @@ table {
 <h4 id="battle_label"></h4>
 
 
+<br />
+<hr />
+
+
+<h3>Demo grenade:</h3>
+<h4>
+	Check off where surrounding enemy units are standing.<br />
+	Red squares are hit, green squares are not.<br />
+	Tiles with enemy units are prioritized.<br />
+</h4>
+
+
+<table id="grenade_table" border=1></table>
+
+<br/>
+
+<input type="button" value="throw grenade" onclick="click_throw_grenade()"></input>
+
+<h4 id="grenade_label"><br /><br /><br /></h4>
+
 <script src="frontend.js"> </script>
 <script src="backend.js"> </script>
 <script type="text/javascript">
-	flow()
+	flow();
+	set_up_grenade_table();
 </script>
 </body>
 </html> 
