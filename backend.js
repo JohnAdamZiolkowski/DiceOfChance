@@ -137,6 +137,14 @@ var troop = function () {
 		this.unit_type = "troop";
 	};
 
+	this.rename = function (player_id, troop_id) {
+		var pplus = player_id - 0 + 1;
+		var tplus = troop_id - 0 + 1;
+		this.name = "p"+pplus+"-t"+tplus;
+		this.player_id = player_id;
+		this.unit_id = troop_id;
+	};
+
 	this.clone = function (troop) {
 		this.hit_points = troop.hit_points;
 		this.attack = troop.attack;
@@ -455,18 +463,50 @@ var make_new_squad = function (player_id, size) {
 	populate_squad_table(player_id);
 };
 
-var kill_troop = function (squad) {
-	alert("can not yet kill troop");
-	//delete troops
-	//remove troop rows
+var kill_troop = function (player_id, troop_id) {
+	var player = players[player_id];
+	player.troops.splice(troop_id, 1);
+
+	var troop, t;
+	for (t = 0; t < player.troops.length; t++) {
+		troop = player.troops[t];
+
+		troop.rename(player_id, t);
+	}
+
+	populate_troop_table(player_id);
+	simulate_attack();
 };
 
-var kill_squad = function (squad) {
-	alert("can not yet kill squad");
-	//delete troops
-	//remove troop rows
-	//delete squad
-	//remove squad row
+var kill_squad = function (player_id, squad_id) {
+	var player = players[player_id];
+	var squad = player.squads[squad_id];
+	
+	var troop, t;
+	for (t = 0; t < squad.troops.length; t++) {
+		troop = squad.troops[t];
+
+		kill_troop(player_id, troop.unit_id);
+	}
+
+	player.squads.splice(squad_id, 1);
+
+	var squad_remaining, s;
+	for (s = 0; s < player.squads.length; s++) {
+		squad_remaining = player.squads[s];
+
+		squad_remaining.recalculate(squad_remaining.troops, player_id, s);
+
+		//todo: move into recalculate
+		for (t = 0; t < squad_remaining.troops.length; t++) {
+			troop = squad_remaining.troops[t];
+			troop.squad_id = s;
+		}
+	}
+
+	populate_troop_table(player_id);
+	populate_squad_table(player_id);
+	simulate_attack();
 };
 
 var get_unit = function (player_id, unit_type, unit_id) {

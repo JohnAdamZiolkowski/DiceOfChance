@@ -88,6 +88,15 @@ var populate_troop_table = function (player_id) {
 		if (in_squad != undefined)
 			button.disabled = "disabled";
 		cell.appendChild(button);
+
+		var cell = row.insertCell(-1);
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "kill";
+		button.onclick = function () {click_kill_troop(this)};
+		if (in_squad != undefined)
+			button.disabled = "disabled";
+		cell.appendChild(button);
 	}
 };
 
@@ -156,6 +165,13 @@ var populate_squad_table = function (player_id) {
 		button.type = "button";
 		button.value = "clone";
 		button.onclick = function () {click_clone_squad(this)};
+		cell.appendChild(button);
+
+		var cell = row.insertCell(-1);
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = "kill";
+		button.onclick = function () {click_kill_squad(this)};
 		cell.appendChild(button);
 	}
 };
@@ -327,6 +343,20 @@ var click_clone_squad = function (e) {
 	var squad_id = get_unit_id_from_element(e);
 
 	clone_squad(player_id, squad_id);
+};
+
+var click_kill_troop = function (e) {
+	var player_id = get_player_id_from_element(e);
+	var troop_id = get_unit_id_from_element(e);
+
+	kill_troop(player_id, troop_id);
+};
+
+var click_kill_squad = function (e) {
+	var player_id = get_player_id_from_element(e);
+	var squad_id = get_unit_id_from_element(e);
+
+	kill_squad(player_id, squad_id);
 };
 
 
